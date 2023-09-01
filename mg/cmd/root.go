@@ -61,6 +61,7 @@ var (
 
 	// Holds a slice of paths to ignore in mg dev watch cmd.
 	IgnoredPaths []string
+	IgnoreMissingEnv bool = false // Command line flag to ignore missing environment variables in metagraf.json
 )
 
 // Array of available config keys

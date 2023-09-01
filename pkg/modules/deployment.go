@@ -100,7 +100,7 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 	}
 
 	EnvVars, err = GetEnvVars(mg, Variables)
-	if err != nil {
+	if err != nil && IgnoreMissingEnv == false {
 		glog.Error(err)
 		panic(err)
 	}

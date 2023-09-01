@@ -103,4 +103,5 @@ var (
 	CreateStatefulSetPersistentVolumeClaim       bool = false
 	StatefulSetPersistentVolumeClaimStorageClass string
 	StatefulSetPersistentVolumeClaimSize         string
+	IgnoreMissingEnv = false // Command line flag to ignore missing environment variables in metagraf.json
 )
