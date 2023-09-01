@@ -31,6 +31,7 @@ func init() {
 	createDeploymentCmd.Flags().StringVar(&params.PodAntiAffinityTopologyKey, "anti-affinity-topology-key", "", "Define which node label to use as a topologyKey (describing a datacenter, zone or a rack as an example)")
 	createDeploymentCmd.Flags().Int32Var(&params.PodAntiAffinityWeight, "pod-anti-affinity-weight", params.PodAntiAffinityWeightDefault, "Weight for WeightedPodAffinityTerm.")
 	createDeploymentCmd.Flags().BoolVar(&params.DownwardAPIEnvVars,"downward-api-envvars",false,"Enables generation of environment variables from Downward API. An opinionated selection.")
+	createDeploymentCmd.Flags().BoolVar(&IgnoreMissingEnv, "ignore-missing-env", false, "Ignore missing environment variables")
 }
 
 var createDeploymentCmd = &cobra.Command{

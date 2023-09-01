@@ -56,6 +56,7 @@ var (
 	CreateGlobals bool
 	// Sets the default pull policy for all metagraf modules
 	PullPolicy corev1.PullPolicy = corev1.PullIfNotPresent
+	IgnoreMissingEnv bool = false
 )
 
 var Variables metagraf.MGProperties

@@ -238,4 +238,5 @@ func FlagPassingHack() {
 	modules.OName = OName
 	modules.Context = Context
 	modules.CreateGlobals = CreateGlobals
+	modules.IgnoreMissingEnv = IgnoreMissingEnv
 }
