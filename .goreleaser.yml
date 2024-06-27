@@ -1,5 +1,6 @@
 # This is an example .goreleaser.yml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
+version: 2
 project_name: metaGraf
 
 before:
@@ -66,7 +67,7 @@ changelog:
 
 brews:
 - name: metagraf
-  tap:
+  repository:
     owner: "{{ .Env.GITHUB_REPOSITORY_OWNER}}"
     name: homebrew-tap
     token: "{{ .Env.HOMEBREW_TOKEN }}"

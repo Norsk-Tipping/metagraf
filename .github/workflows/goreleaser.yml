@@ -44,10 +44,10 @@ jobs:
           echo "GITBRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
       -
         name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v6
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
