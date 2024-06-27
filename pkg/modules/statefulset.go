@@ -57,6 +57,10 @@ func GenStatefulSet(mg *metagraf.MetaGraf, namespace string) {
 	// Add labels from params
 	l = MergeLabels(l, LabelsFromParams(params.Labels))
 
+	// Resource annotations
+	a := Labels(objname, mg.Metadata.Annotations)
+	a = MergeLabels(a, AnnotationsFromParams(params.Annotations))
+
 	// Selector
 	sm := make(map[string]string)
 	sm["app"] = objname
@@ -168,10 +172,10 @@ func GenStatefulSet(mg *metagraf.MetaGraf, namespace string) {
 			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      objname,
-			Labels:    l,
-			Namespace: namespace,
-			Annotations: mg.Metadata.Annotations,
+			Name:        objname,
+			Labels:      l,
+			Namespace:   namespace,
+			Annotations: a,
 		},
 		Spec: appsv1.StatefulSetSpec{
 			Replicas:             &params.Replicas,
@@ -183,9 +187,9 @@ func GenStatefulSet(mg *metagraf.MetaGraf, namespace string) {
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      objname,
-					Labels:    l,
-					Namespace: namespace,
+					Name:        objname,
+					Labels:      l,
+					Namespace:   namespace,
 					Annotations: mg.Metadata.Annotations,
 				},
 				Spec: corev1.PodSpec{

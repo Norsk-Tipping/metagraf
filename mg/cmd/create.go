@@ -38,6 +38,8 @@ func init() {
 	createCmd.PersistentFlags().StringVar(&Version, "version", "", "Override version in metaGraf specification.")
 	createCmd.PersistentFlags().BoolVar(&Dryrun, "dryrun", false, "do not create objects, only output")
 	createCmd.PersistentFlags().StringSliceVar(&params.Labels, "labels", []string{}, "Provide extra labels as key=value pairs, seperated by ,")
+	createCmd.PersistentFlags().StringSliceVar(&params.Annotations, "annotations", []string{}, "Provide extra annotations as key=value pairs, seperated by ,")
+
 	createCmd.AddCommand(createConfigMapCmd)
 	createCmd.AddCommand(createDotCmd)
 	createCmd.AddCommand(createSecretCmd)

@@ -57,6 +57,10 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 	// Add labels from params
 	l = MergeLabels(l, LabelsFromParams(params.Labels))
 
+	// Resource annotations
+	a := Labels(objname, mg.Metadata.Annotations)
+	a = MergeLabels(a, AnnotationsFromParams(params.Annotations))
+
 	// Selector
 	sm := make(map[string]string)
 	sm["app"] = objname
@@ -162,10 +166,10 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      objname,
-			Labels:    l,
-			Annotations: mg.Metadata.Annotations,
-			Namespace: namespace,
+			Name:        objname,
+			Labels:      l,
+			Annotations: a,
+			Namespace:   namespace,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas:             &params.Replicas,
@@ -177,9 +181,9 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:      objname,
-					Labels:    l,
-					Namespace: namespace,
+					Name:        objname,
+					Labels:      l,
+					Namespace:   namespace,
 					Annotations: mg.Metadata.Annotations,
 				},
 				Spec: corev1.PodSpec{
