@@ -44,7 +44,7 @@ func init() {
 	argocdCreateApplicationCmd.Flags().BoolVar(&argocd.AppOpts.AutomatedSyncPolicyPrune, "auto-prune", false, "Automatically delete removed items")
 	argocdCreateApplicationCmd.Flags().BoolVar(&argocd.AppOpts.AutomatedSyncPolicySelfHeal, "auto-heal", false, "Try to self heal?")
 	argocdCreateApplicationCmd.Flags().StringSliceVar(&params.Labels, "labels", []string{}, "Provide extra labels as key=value pairs, seperated by ,")
-
+	argocdCreateApplicationCmd.Flags().StringSliceVar(&params.Annotations, "annotations", []string{}, "Provide extra annotations as key=value pairs, seperated by ','")
 	_ = argocdCreateCmd.MarkPersistentFlagRequired("namespace")
 	_ = argocdCreateApplicationCmd.MarkFlagRequired("project")
 	_ = argocdCreateApplicationCmd.MarkFlagRequired("repo")
@@ -101,7 +101,7 @@ var argocdCreateApplicationCmd = &cobra.Command{
 
 		// Add labels from params
 		app.Labels = modules.MergeLabels(app.Labels, modules.LabelsFromParams(params.Labels))
-
+		app.Annotations = modules.AnnotationsFromParams(params.Annotations)
 		if params.Output {
 			argocd.OutputApplication(app, params.Format)
 		}

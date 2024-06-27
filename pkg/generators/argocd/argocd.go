@@ -160,13 +160,14 @@ func (g *ApplicationGenerator) Application(name string) argoapp.Application {
 			APIVersion: "argoproj.io/v1alpha1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: g.Options.Namespace,
-			Labels:    g.MetaGraf.Metadata.Labels,
+			Name:        name,
+			Namespace:   g.Options.Namespace,
+			Labels:      g.MetaGraf.Metadata.Labels,
+			Annotations: g.MetaGraf.Metadata.Annotations,
 		},
 		Spec: argoapp.ApplicationSpec{
 			Destination: argoapp.ApplicationDestination{
-				Server:    g.Options.ApplicationDestinationServer,
+				Server: g.Options.ApplicationDestinationServer,
 				// todo revert to g.Options.ApplicationDestinationNamespace
 				Namespace: g.Options.Namespace,
 			},

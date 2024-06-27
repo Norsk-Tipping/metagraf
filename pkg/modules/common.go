@@ -55,8 +55,8 @@ var (
 	Context       string // Application context root from FlagPassingHack.
 	CreateGlobals bool
 	// Sets the default pull policy for all metagraf modules
-	PullPolicy corev1.PullPolicy = corev1.PullIfNotPresent
-	IgnoreMissingEnv bool = false
+	PullPolicy       corev1.PullPolicy = corev1.PullIfNotPresent
+	IgnoreMissingEnv bool              = false
 )
 
 var Variables metagraf.MGProperties
@@ -189,18 +189,17 @@ func GetEnvVars(mg *metagraf.MetaGraf, inputprops metagraf.MGProperties) (output
 	for _, output := range outputevars {
 		outputevarsmap[output.Name] = output.Value
 	}
-	 for _, specenv := range specenvsmap {
-		if _, ok := outputevarsmap[specenv.Name]; ! ok && specenv.Required {
-				glog.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
-				err = fmt.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
-				return nil, err
+	for _, specenv := range specenvsmap {
+		if _, ok := outputevarsmap[specenv.Name]; !ok && specenv.Required {
+			glog.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
+			err = fmt.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
+			return nil, err
 
 		}
 	}
 
 	return outputevars, err
 }
-
 
 func GetBuildEnvVars(mg *metagraf.MetaGraf, mgp metagraf.MGProperties) []corev1.EnvVar {
 	var envs []corev1.EnvVar
@@ -474,6 +473,18 @@ func LabelsFromParams(labels []string) map[string]string {
 	return ret
 }
 
+func AnnotationsFromParams(annotations []string) map[string]string {
+	ret := make(map[string]string)
+	for _, s := range annotations {
+		split := strings.Split(s, "=")
+		if len(split) != 2 {
+			continue
+		}
+		ret[split[0]] = split[1]
+	}
+	return ret
+}
+
 // Generate standardised labels map
 func Labels(name string, input map[string]string) map[string]string {
 	// Resource labels
@@ -486,6 +497,7 @@ func Labels(name string, input map[string]string) map[string]string {
 }
 
 // Merge two Labels maps, first input gets overriden by second input
+// TODO: rename function to a more generic like MergeMaps
 func MergeLabels(first map[string]string, second map[string]string) map[string]string {
 	// check if first is initialized
 	if first == nil {

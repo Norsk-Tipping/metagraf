@@ -28,4 +28,7 @@ var (
 
 	// Slice of strings to hold any labels added through --labels argument.
 	Labels []string
+
+	// Slice of strings to hold any annotations added through --annotations argument.
+	Annotations []string
 )
