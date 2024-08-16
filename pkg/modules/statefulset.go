@@ -190,7 +190,7 @@ func GenStatefulSet(mg *metagraf.MetaGraf, namespace string) {
 					Name:        objname,
 					Labels:      l,
 					Namespace:   namespace,
-					Annotations: mg.Metadata.Annotations,
+					Annotations: a,
 				},
 				Spec: corev1.PodSpec{
 					Containers: Containers,
