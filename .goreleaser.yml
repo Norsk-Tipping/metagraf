@@ -17,6 +17,7 @@ builds:
     goos:
     - darwin
     - linux
+    - windows
     goarch:
     - "amd64"
     - "arm64"
@@ -27,22 +28,9 @@ builds:
     - -X "github.com/laetho/metagraf/pkg/mgver.GitHash={{ .Env.GITHASH }}"
     - -X "github.com/laetho/metagraf/pkg/mgver.GitTag={{ .Env.GITTAG }}"
     - -X "github.com/laetho/metagraf/pkg/mgver.GitBranch={{ .Env.GITBRANCH }}"
-
-  -
-    binary: mg
-    dir: mg
-    goos:
-    - windows
-    goarch:
-    - "amd64"
-    env:
-    - CGO_ENABLED=0
-    ldflags:
-    - -extldflags '-static'
-    - -X "github.com/laetho/metagraf/pkg/mgver.GitHash={{ .Env.GITHASH }}"
-    - -X "github.com/laetho/metagraf/pkg/mgver.GitTag={{ .Env.GITTAG }}"
-    - -X "github.com/laetho/metagraf/pkg/mgver.GitBranch={{ .Env.GITBRANCH }}"
-
+    ignore:
+      - goos: windows
+        goarch: arm64
 dockers:
   -
     goos: linux
