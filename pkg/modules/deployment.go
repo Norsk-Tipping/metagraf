@@ -123,6 +123,13 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 		}
 	}
 
+	// Append namespace as an environment variable
+	nameSpaceEnv := corev1.EnvVar{
+		Name:  "NAMESPACE",
+		Value: namespace,
+	}
+	EnvVars = append(EnvVars, nameSpaceEnv)
+
 	// ContainerPorts
 	if HasImageInfo {
 		for k := range ImageInfo.Config.ExposedPorts {
