@@ -18,4 +18,4 @@ brew install metagraf
 
 ## Status
 
-This is a fork of https://github.com/laetho/metagraf. It contains releases tailored for the needs of Norsk-Tipping. Although we will try to stay in sync and contribute back to upstream, it might diverge from the original project in the future.
+This is a fork of https://github.com/laetho/metagraf. It contains releases tailored for the needs of Norsk-Tipping.
