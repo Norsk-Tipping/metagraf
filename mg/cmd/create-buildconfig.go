@@ -35,6 +35,10 @@ func init() {
 	createBuildConfigCmd.Flags().StringVar(&params.SourceRef, "ref", "", "specify source ref or branch name.")
 	createBuildConfigCmd.Flags().StringSliceVar(&CVars, "cvars", []string{}, "Slice of key=value pairs, seperated by ,")
 	createBuildConfigCmd.Flags().StringSliceVar(&params.BuildParams, "buildparams", []string{}, "Slice of key=value pairs, seperated by ,")
+	createBuildConfigCmd.Flags().StringVar(&params.BuildMemoryLimit, "build-memory-limit", "", "Memory limit for the build pod (e.g. 6Gi). Empty means no limit.")
+	createBuildConfigCmd.Flags().StringVar(&params.BuildMemoryRequest, "build-memory-request", "", "Memory request for the build pod (e.g. 1Gi). Empty means unset.")
+	createBuildConfigCmd.Flags().StringVar(&params.BuildCPULimit, "build-cpu-limit", "", "CPU limit for the build pod (e.g. 2). Empty means no limit.")
+	createBuildConfigCmd.Flags().StringVar(&params.BuildCPURequest, "build-cpu-request", "", "CPU request for the build pod (e.g. 500m). Empty means unset.")
 }
 
 var createBuildConfigCmd = &cobra.Command{
