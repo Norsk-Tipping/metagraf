@@ -32,9 +32,44 @@ import (
 
 	buildv1 "github.com/openshift/api/build/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	//"github.com/openshift/oc/pkg/helpers/source-to-image/tar"
 )
+
+// buildPodResources assembles a corev1.ResourceRequirements for the build pod
+// from the build resource params (memory/cpu limit and request). Only values
+// that are set are included; when no params are provided it returns an empty
+// ResourceRequirements, preserving the previous behavior of not constraining
+// the build pod. Setting a memory limit lets the container build engine give
+// the build cgroup a sane memory.max instead of a near-infinite value, which
+// otherwise causes JVM-based builds to size their heap off bogus memory.
+func buildPodResources() corev1.ResourceRequirements {
+	res := corev1.ResourceRequirements{}
+	limits := corev1.ResourceList{}
+	requests := corev1.ResourceList{}
+
+	if len(params.BuildMemoryLimit) > 0 {
+		limits[corev1.ResourceMemory] = resource.MustParse(params.BuildMemoryLimit)
+	}
+	if len(params.BuildCPULimit) > 0 {
+		limits[corev1.ResourceCPU] = resource.MustParse(params.BuildCPULimit)
+	}
+	if len(params.BuildMemoryRequest) > 0 {
+		requests[corev1.ResourceMemory] = resource.MustParse(params.BuildMemoryRequest)
+	}
+	if len(params.BuildCPURequest) > 0 {
+		requests[corev1.ResourceCPU] = resource.MustParse(params.BuildCPURequest)
+	}
+
+	if len(limits) > 0 {
+		res.Limits = limits
+	}
+	if len(requests) > 0 {
+		res.Requests = requests
+	}
+	return res
+}
 
 func GenBuildConfig(mg *metagraf.MetaGraf) {
 
@@ -113,6 +148,7 @@ func GenBuildConfig(mg *metagraf.MetaGraf) {
 				Output: buildv1.BuildOutput{
 					To: toObjRef,
 				},
+				Resources: buildPodResources(),
 			},
 		},
 	}

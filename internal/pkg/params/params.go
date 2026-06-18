@@ -104,4 +104,14 @@ var (
 	StatefulSetPersistentVolumeClaimStorageClass string
 	StatefulSetPersistentVolumeClaimSize         string
 	IgnoreMissingEnv = false // Command line flag to ignore missing environment variables in metagraf.json
+
+	// Build pod resource limits/requests applied to generated BuildConfigs.
+	// These map to the build pod's resources block. Empty values are omitted,
+	// preserving the previous behavior of not setting any resource constraints.
+	// Setting a memory limit is what allows the container build engine (buildah)
+	// to give the build cgroup a sane memory.max instead of a near-infinite value.
+	BuildMemoryLimit   string
+	BuildMemoryRequest string
+	BuildCPULimit      string
+	BuildCPURequest    string
 )
