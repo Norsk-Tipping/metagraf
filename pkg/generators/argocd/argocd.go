@@ -17,19 +17,19 @@ limitations under the License.
 */
 
 import (
-	"bytes"
 	"context"
 	gojson "encoding/json"
 	"fmt"
 	"os"
 
-	argoapp "github.com/argoproj/argo-cd/pkg/apis/application/v1alpha1"
 	"github.com/laetho/metagraf/internal/pkg/k8sclient"
 	"github.com/laetho/metagraf/internal/pkg/params"
+	argoapp "github.com/laetho/metagraf/pkg/apis/argocd/v1alpha1"
 	"github.com/laetho/metagraf/pkg/metagraf"
 	"gopkg.in/yaml.v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/serializer/json"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	log "k8s.io/klog"
 )
 
@@ -156,8 +156,8 @@ func (g *ApplicationGenerator) Application(name string) argoapp.Application {
 
 	obj := argoapp.Application{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "Application",
-			APIVersion: "argoproj.io/v1alpha1",
+			Kind:       argoapp.ApplicationKind,
+			APIVersion: argoapp.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        name,
@@ -181,32 +181,22 @@ func (g *ApplicationGenerator) Application(name string) argoapp.Application {
 			SyncPolicy: g.applicationSyncPolicy(),
 			Info:       meta,
 		},
-		Operation: nil,
 	}
 	return obj
 }
 
 func OutputApplication(obj argoapp.Application, format string) {
-	opt := json.SerializerOptions{
-		Yaml:   false,
-		Pretty: true,
-		Strict: true,
-	}
-	s := json.NewSerializerWithOptions(json.DefaultMetaFactory, nil, nil, opt)
-
-	var buff bytes.Buffer
-	err := s.Encode(obj.DeepCopyObject(), &buff)
+	// Round-trip through a map so keys are sorted the same way for json and yaml.
+	b, err := gojson.Marshal(obj)
 	if err != nil {
 		log.Error(err)
 		os.Exit(1)
 	}
 	jsonMap := make(map[string]interface{})
-	err = gojson.Unmarshal(buff.Bytes(), &jsonMap)
+	err = gojson.Unmarshal(b, &jsonMap)
 	if err != nil {
 		panic(err)
 	}
-
-	delete(jsonMap, "status")
 
 	if format == "json" {
 		oj, err := gojson.MarshalIndent(jsonMap, "", "  ")
@@ -229,19 +219,28 @@ func StoreApplication(obj argoapp.Application) {
 	log.V(2).Infof("ResourceVersion: %v Length: %v", obj.ResourceVersion, len(obj.ResourceVersion))
 	log.V(2).Infof("Namespace: %v", params.NameSpace)
 
-	client := k8sclient.GetArgoCDClient().Applications(params.NameSpace)
+	content, err := runtime.DefaultUnstructuredConverter.ToUnstructured(&obj)
+	if err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	u := &unstructured.Unstructured{Object: content}
+
+	client := k8sclient.GetArgoCDApplicationClient(params.NameSpace)
 	if len(obj.ResourceVersion) > 0 {
 		// update
-		result, err := client.Update(context.TODO(), &obj, metav1.UpdateOptions{})
+		result, err := client.Update(context.TODO(), u, metav1.UpdateOptions{})
 		if err != nil {
 			log.Info(err)
+			return
 		}
-		log.Infof("Updated ArgoCD Application: %v(%v)", result.Name, obj.Name)
+		log.Infof("Updated ArgoCD Application: %v(%v)", result.GetName(), obj.Name)
 	} else {
-		result, err := client.Create(context.TODO(), &obj, metav1.CreateOptions{})
+		result, err := client.Create(context.TODO(), u, metav1.CreateOptions{})
 		if err != nil {
 			log.Info(err)
+			return
 		}
-		log.Infof("Created ArgoCD Application: %v(%v)", result.Name, obj.Name)
+		log.Infof("Created ArgoCD Application: %v(%v)", result.GetName(), obj.Name)
 	}
 }

@@ -22,12 +22,13 @@ import (
 	"path/filepath"
 	"runtime"
 
-	argocdv1alpha1client "github.com/argoproj/argo-cd/pkg/client/clientset/versioned/typed/application/v1alpha1"
 	monitoringv1client "github.com/coreos/prometheus-operator/pkg/client/versioned/typed/monitoring/v1"
+	argov1alpha1 "github.com/laetho/metagraf/pkg/apis/argocd/v1alpha1"
 	appsv1client "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	buildv1client "github.com/openshift/client-go/build/clientset/versioned/typed/build/v1"
 	imagev1client "github.com/openshift/client-go/image/clientset/versioned/typed/image/v1"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
@@ -184,14 +185,15 @@ func GetMonitoringV1Client() *monitoringv1client.MonitoringV1Client {
 	return client
 }
 
-func GetArgoCDClient() *argocdv1alpha1client.ArgoprojV1alpha1Client {
+// Returns a client for ArgoCD Application resources in the given namespace.
+func GetArgoCDApplicationClient(namespace string) dynamic.ResourceInterface {
 	if RestConfig == nil {
 		RestConfig = getRestConfig(getKubeConfig())
 	}
 
-	client, err := argocdv1alpha1client.NewForConfig(RestConfig)
+	client, err := dynamic.NewForConfig(RestConfig)
 	if err != nil {
 		panic(err)
 	}
-	return client
+	return client.Resource(argov1alpha1.ApplicationResource).Namespace(namespace)
 }

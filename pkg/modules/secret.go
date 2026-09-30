@@ -262,20 +262,13 @@ func DeleteSecrets(mg *metagraf.MetaGraf) {
 
 func DeleteSecret(name string) {
 	client := k8sclient.GetCoreClient().Secrets(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("Secret: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete Secret: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted Secret: ", name, ", in namespace: ", NameSpace)
+	deleteResource("Secret", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }
 
 func CreateEmptySecret(name string, labels map[string]string ) corev1.Secret {

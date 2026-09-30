@@ -63,28 +63,6 @@ var argocdCreateCmd = &cobra.Command{
 	Long:  `Create Subcommands for ArgoCD`,
 }
 
-/*
-var argocdCreateApplicationCmd = &cobra.Command{
-	TraverseChildren: true,
-	Use:              "application <metagraf>",
-	Short:            "argocd create application",
-	Long:             `Creates an ArgoCD Application from a metagraf specification`,
-	Run: func(cmd *cobra.Command, args []string) {
-		requireMetagraf(args)
-		requireNamespace()
-		mg := metagraf.Parse(args[0])
-
-		app := modules.GenArgoApplication(&mg, )
-		if !params.Dryrun {
-			modules.StoreArgoCDApplication(app)
-		}
-		if params.Output{
-			modules.OutputArgoCDApplication(app)
-		}
-	},
-}
-*/
-
 var argocdCreateApplicationCmd = &cobra.Command{
 	TraverseChildren: true,
 	Use:              "application <metagraf>",

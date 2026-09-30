@@ -157,18 +157,11 @@ func StoreServiceMonitor(obj monitoringv1.ServiceMonitor) {
 
 func DeleteServiceMonitor(name string) {
 	client := k8sclient.GetMonitoringV1Client().ServiceMonitors(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("The ServiceMonitor: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete ServiceMonitor: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted ServiceMonitor: ", name, ", in namespace: ", NameSpace)
+	deleteResource("ServiceMonitor", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

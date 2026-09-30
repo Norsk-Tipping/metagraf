@@ -20,7 +20,6 @@ import (
 	"bytes"
 	gojson "encoding/json"
 	"fmt"
-	"github.com/golang/glog"
 	"os"
 	"strconv"
 	"strings"
@@ -191,7 +190,7 @@ func GetEnvVars(mg *metagraf.MetaGraf, inputprops metagraf.MGProperties) (output
 	}
 	for _, specenv := range specenvsmap {
 		if _, ok := outputevarsmap[specenv.Name]; !ok && specenv.Required {
-			glog.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
+			log.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
 			err = fmt.Errorf("environment variable with name [%s] is missing or has no value", specenv.Name)
 			return nil, err
 
@@ -531,4 +530,20 @@ func DownwardAPIEnvVars() []corev1.EnvVar {
 		vars = append(vars, ev)
 	}
 	return vars
+}
+
+// deleteResource deletes the named resource of the given kind in NameSpace.
+// get is used to check that the resource exists before del is called.
+func deleteResource(kind string, name string, get func() error, del func() error) {
+	if err := get(); err != nil {
+		fmt.Println(kind+": ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
+		return
+	}
+
+	if err := del(); err != nil {
+		fmt.Println("Unable to delete "+kind+": ", name, " in namespace: ", NameSpace)
+		log.Error(err)
+		return
+	}
+	fmt.Println("Deleted "+kind+": ", name, ", in namespace: ", NameSpace)
 }

@@ -3,13 +3,12 @@ module github.com/laetho/metagraf
 go 1.16
 
 require (
-	github.com/argoproj/argo-cd v1.8.7
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/coreos/prometheus-operator v0.41.1
 	github.com/crossplane/oam-kubernetes-runtime v0.3.3
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/ghodss/yaml v1.0.0
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/go-logr/logr v0.2.1 // indirect
 	github.com/google/go-containerregistry v0.11.0
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
@@ -25,13 +24,11 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 	istio.io/api v0.0.0-20200208020912-9564cdd03c96
 	k8s.io/api v0.20.6
+	k8s.io/apiextensions-apiserver v0.19.2 // indirect
 	k8s.io/apimachinery v0.20.6
-	k8s.io/apiserver v0.20.6 // indirect
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/component-base v0.20.6 // indirect
 	k8s.io/klog v1.0.0
 	k8s.io/klog/v2 v2.4.0
-	k8s.io/kubectl v0.19.10 // indirect
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
 	sigs.k8s.io/application v0.8.3
 )

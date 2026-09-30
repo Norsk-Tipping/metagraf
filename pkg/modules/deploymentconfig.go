@@ -19,7 +19,6 @@ package modules
 import (
 	"context"
 	"fmt"
-	"github.com/golang/glog"
 	"os"
 	"strconv"
 	"strings"
@@ -101,7 +100,7 @@ func GenDeploymentConfig(mg *metagraf.MetaGraf) {
 
 	EnvVars, err = GetEnvVars(mg, Variables)
 	if err != nil {
-		glog.Error(err)
+		log.Error(err)
 		panic(err)
 	}
 	if params.DownwardAPIEnvVars {
@@ -353,18 +352,11 @@ func StoreDeploymentConfig(obj appsv1.DeploymentConfig) {
 
 func DeleteDeploymentConfig(name string) {
 	client := k8sclient.GetAppsClient().DeploymentConfigs(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("DeploymentConfig: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Service to delete DeploymentConfig: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted DeploymentConfig: ", name, ", in namespace: ", NameSpace)
+	deleteResource("DeploymentConfig", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

@@ -25,7 +25,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang/glog"
 	k8sclient "github.com/laetho/metagraf/internal/pkg/k8sclient"
 	params "github.com/laetho/metagraf/internal/pkg/params"
 	"github.com/laetho/metagraf/pkg/metagraf"
@@ -129,23 +128,23 @@ func GenPodDisruptionBudget(mg *metagraf.MetaGraf, replicas int32) v1beta1.PodDi
 
 func StorePodDisruptionBudget(obj v1beta1.PodDisruptionBudget) {
 
-	glog.Infof("ResourceVersion: %v Length: %v", obj.ResourceVersion, len(obj.ResourceVersion))
-	glog.Infof("Namespace: %v", params.NameSpace)
+	log.Infof("ResourceVersion: %v Length: %v", obj.ResourceVersion, len(obj.ResourceVersion))
+	log.Infof("Namespace: %v", params.NameSpace)
 
 	client := k8sclient.GetKubernetesClient().PolicyV1beta1().PodDisruptionBudgets(params.NameSpace)
 	if len(obj.ResourceVersion) > 0 {
 		// update
 		result, err := client.Update(context.TODO(), &obj, metav1.UpdateOptions{})
 		if err != nil {
-			glog.Info(err)
+			log.Info(err)
 		}
-		glog.Infof("Updated: %v(%v)", result.Name, obj.Name)
+		log.Infof("Updated: %v(%v)", result.Name, obj.Name)
 	} else {
 		result, err := client.Create(context.TODO(), &obj, metav1.CreateOptions{})
 		if err != nil {
-			glog.Info(err)
+			log.Info(err)
 		}
-		glog.Infof("Created: %v(%v)", result.Name, obj.Name)
+		log.Infof("Created: %v(%v)", result.Name, obj.Name)
 	}
 }
 
