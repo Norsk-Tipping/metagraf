@@ -101,18 +101,11 @@ func StoreService(obj corev1.Service) {
 
 func DeleteService(name string) {
 	client := k8sclient.GetCoreClient().Services(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("Service: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete Service: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted Service: ", name, ", in namespace: ", NameSpace)
+	deleteResource("Service", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

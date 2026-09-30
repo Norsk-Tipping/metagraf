@@ -104,18 +104,11 @@ func StoreImageStream(obj imagev1.ImageStream) {
 
 func DeleteImageStream(name string) {
 	client := k8sclient.GetImageClient().ImageStreams(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("ImageStream: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete ImageStream: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted ImageStream: ", name, ", in namespace: ", NameSpace)
+	deleteResource("ImageStream", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

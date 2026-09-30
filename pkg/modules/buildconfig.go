@@ -255,18 +255,11 @@ func StoreBuildConfig(obj buildv1.BuildConfig) {
 
 func DeleteBuildConfig(name string) {
 	client := k8sclient.GetBuildClient().BuildConfigs(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("The BuildConfig: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete BuildConfig: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted BuildConfig: ", name, ", in namespace: ", NameSpace)
+	deleteResource("BuildConfig", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

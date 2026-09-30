@@ -21,7 +21,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/glog"
 	"github.com/laetho/metagraf/internal/pkg/affinity"
 	"github.com/laetho/metagraf/internal/pkg/helpers"
 	"github.com/laetho/metagraf/internal/pkg/k8sclient"
@@ -29,6 +28,7 @@ import (
 	"github.com/laetho/metagraf/pkg/metagraf"
 	"github.com/spf13/viper"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	log "k8s.io/klog"
 
 	//corev1 "k8s.io/api/core/v1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -105,7 +105,7 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 
 	EnvVars, err = GetEnvVars(mg, Variables)
 	if err != nil && IgnoreMissingEnv == false {
-		glog.Error(err)
+		log.Error(err)
 		panic(err)
 	}
 	if params.DownwardAPIEnvVars {
@@ -216,22 +216,22 @@ func GenDeployment(mg *metagraf.MetaGraf, namespace string) {
 
 func StoreDeployment(obj appsv1.Deployment) {
 
-	glog.Infof("ResourceVersion: %v Length: %v", obj.ResourceVersion, len(obj.ResourceVersion))
-	glog.Infof("Namespace: %v", NameSpace)
+	log.Infof("ResourceVersion: %v Length: %v", obj.ResourceVersion, len(obj.ResourceVersion))
+	log.Infof("Namespace: %v", NameSpace)
 
 	client := k8sclient.GetKubernetesClient().AppsV1().Deployments(NameSpace)
 	if len(obj.ResourceVersion) > 0 {
 		// update
 		result, err := client.Update(context.TODO(), &obj, metav1.UpdateOptions{})
 		if err != nil {
-			glog.Info(err)
+			log.Info(err)
 		}
-		glog.Infof("Updated Deployment: %v(%v)", result.Name, obj.Name)
+		log.Infof("Updated Deployment: %v(%v)", result.Name, obj.Name)
 	} else {
 		result, err := client.Create(context.TODO(), &obj, metav1.CreateOptions{})
 		if err != nil {
-			glog.Info(err)
+			log.Info(err)
 		}
-		glog.Infof("Created Deployment: %v(%v)", result.Name, obj.Name)
+		log.Infof("Created Deployment: %v(%v)", result.Name, obj.Name)
 	}
 }

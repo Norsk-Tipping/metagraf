@@ -125,17 +125,11 @@ func StoreRoute(obj routev1.Route) {
 
 func DeleteRoute(name string) {
 	client := k8sclient.GetRouteClient().Routes(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("Route: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete Route: ", name, " in namespace: ", NameSpace)
-		return
-	}
-	fmt.Println("Deleted Route: ", name, ", in namespace: ", NameSpace)
+	deleteResource("Route", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }

@@ -250,18 +250,11 @@ func DeleteConfigMaps(mg *metagraf.MetaGraf) {
 
 func DeleteConfigMap(name string) {
 	client := k8sclient.GetCoreClient().ConfigMaps(NameSpace)
-
-	_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
-	if err != nil {
-		fmt.Println("ConfigMap: ", name, "does not exist in namespace: ", NameSpace, ", skipping...")
-		return
-	}
-
-	err = client.Delete(context.TODO(), name, metav1.DeleteOptions{})
-	if err != nil {
-		fmt.Println("Unable to delete ConfigMap: ", name, " in namespace: ", NameSpace)
-		log.Error(err)
-		return
-	}
-	fmt.Println("Deleted Configmap: ", name, ", in namespace: ", NameSpace)
+	deleteResource("ConfigMap", name,
+		func() error {
+			_, err := client.Get(context.TODO(), name, metav1.GetOptions{})
+			return err
+		},
+		func() error { return client.Delete(context.TODO(), name, metav1.DeleteOptions{}) },
+	)
 }
